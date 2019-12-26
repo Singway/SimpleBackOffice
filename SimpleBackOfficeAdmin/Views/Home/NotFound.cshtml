@@ -1,0 +1,11 @@
+﻿@{
+    Layout = "_LayoutEmpty";
+    ViewBag.Title = "页面不存在";
+}
+<div class="container">
+    <div class="row">
+        <h1 class="col-12">@ViewBag.ErrorMessage</h1>
+        <br class="col-12" />
+        <p class="col-12">您访问的页面不存在<a asp-controller="Home" asp-action="Index">点击返回首页</a></p>
+    </div>
+</div>

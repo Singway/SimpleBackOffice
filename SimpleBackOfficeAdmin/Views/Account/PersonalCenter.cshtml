@@ -1,0 +1,161 @@
+﻿@{
+    ViewBag.Title = "个人中心";
+}
+
+@model PersonalViewModel
+
+@section Css{
+    <link href="~/css/forms/select2.min.css" rel="stylesheet" />
+    <link href="~/css/forms/select2-bootstrap.min.css" rel="stylesheet" />
+}
+<div class="content-wrapper">
+    <div class="page-header">
+        <h3 class="page-title"> 个人中心 </h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index"><i class="icon-home"></i>首页</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@ViewBag.Title</li>
+            </ol>
+        </nav>
+    </div>
+    <div asp-validation-summary="All"></div>
+    @*修改信息*@
+    <div class="col-12 grid-margin">
+        <div class="card">
+            <span class="card-header">个人信息</span>
+            <div class="card-body">
+                <form enctype="multipart/form-data" class="form-sample" asp-action="EditInfo">
+                    <p class="card-description">可修改信息</p>
+                    <input asp-for="Id" type="hidden" />
+                    <input asp-for="Psw.NewPassword" value="ABcd1234adfasdf" type="hidden" />
+                    <input asp-for="Psw.CurrentPassword" value="ABcd1234sdfa2" type="hidden" />
+                    <input asp-for="Psw.ConfirmPassword" value="ABcd1234adfasdf" type="hidden" />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">城 市：@Model.City</label>
+                                <div class="col-sm-9">
+                                    <select class="form-control prov" id="prov_Edit" onchange="showCity('Edit')">
+                                        <option>=请选择省份=</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <div class="col-sm-9">
+                                    <select class="form-control" id="city_Edit" onchange="putValue('Edit')">
+                                        <option>=请选择城市=</option>
+                                    </select>
+                                </div>
+                                <label class="col-sm-3 col-form-label"></label>
+                            </div>
+                        </div>
+                        <input asp-for="City" type="hidden" class="form-control" value="@Model.City" id="addr_Edit">
+                        <span asp-validation-for="EditEmail" id="citySpan_Edit" class="text-danger"></span>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label asp-for="EditEmail" class="col-sm-3 col-form-label">邮 箱：</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="EditEmail" class="form-control col-sm-9" placeholder="邮 箱">
+                                </div>
+                                <span asp-validation-for="EditEmail" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label asp-for="NickName" class="col-sm-3 col-form-label">昵 称：</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="NickName" class="form-control col-sm-9" placeholder="昵 称">
+                                </div>
+                                <span asp-validation-for="NickName" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label asp-for="PhotoFile" class="col-sm-3 col-form-label">头 像：</label>
+                                <div class="col-sm-9 custom-file">
+                                    <input asp-for="PhotoFile" multiple class="form-control custom-file-input col-sm-9" />
+                                    <label class="custom-file-label">请选择照片。。。</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <div class="col-sm-3"></div>
+                                <div class="col-sm-9">
+                                    <button type="submit" class="btn ml-lg-auto btn-dark btn-block">修  改 <i class="icon-pencil"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @*修改密码*@
+    <div class="col-12 grid-margin">
+        <div class="card">
+            <span class="card-header">修改密码</span>
+            <div class="card-body">
+                <form enctype="multipart/form-data" class="form-sample" asp-action="EditPassword">
+                    <input asp-for="Id" type="hidden" />
+                    <input asp-for="EditEmail" type="hidden" />
+                    <input asp-for="City" type="hidden" />
+                    <input asp-for="NickName" type="hidden" />
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group row">
+                                <label asp-for="Psw.CurrentPassword" class="col-sm-3 col-form-label">原密码：</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="Psw.CurrentPassword" class="form-control col-sm-9" placeholder="原密码">
+                                </div>
+                                <span asp-validation-for="Psw.CurrentPassword" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group row">
+                                <label asp-for="Psw.NewPassword" class="col-sm-3 col-form-label">新密码：</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="Psw.NewPassword" class="form-control col-sm-9" placeholder="新密码">
+                                </div>
+                                <span asp-validation-for="Psw.NewPassword" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group row">
+                                <label asp-for="Psw.ConfirmPassword" class="col-sm-3 col-form-label">确认密码：</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="Psw.ConfirmPassword" class="form-control col-sm-9" placeholder="确认密码">
+                                </div>
+                                <span asp-validation-for="Psw.ConfirmPassword" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group row">
+                                <div class="col-sm-3"></div>
+                                <div class="col-sm-9">
+                                    <button type="submit" class="btn ml-lg-auto btn-dark btn-block">修  改 <i class="icon-pencil"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Js{
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+    <script src="~/js/Area/City.js" asp-append-version="true"></script>
+    <script src="~/js/Area/Method.js" asp-append-version="true"></script>
+    <script src="~/js/select2.min.js"></script>
+    <script src="~/js/ShowFileName.js"></script>
+}

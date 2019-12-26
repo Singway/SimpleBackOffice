@@ -1,0 +1,81 @@
+﻿@{
+    Layout = "_LayoutEmpty";
+}
+
+@model LoginModel
+
+
+@section Css{
+    <link href="~/css/Area.css" rel="stylesheet" />
+}
+<div class="content-wrapper d-flex align-items-center auth">
+    <div class="row flex-grow">
+        <div class="col-lg-4 mx-auto">
+            <div class="auth-form-light text-left p-5">
+                <div class="brand-logo">
+                    <h2>Simple</h2>
+                </div>
+                <h4>你好，欢迎注册！</h4>
+                <h6 class="font-weight-light">注册超简单，只需简单几步</h6>
+                <form class="text-danger pt-3" asp-action="Register" method="post">
+                    <div class="form-group">
+                        <input class="form-control form-control-lg" asp-for="RegisterEmail" placeholder="邮箱">
+                        <span class="text-danger" asp-validation-for="RegisterEmail"></span>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control form-control-lg" asp-for="RegisterName" placeholder="登录名">
+                        <span class="text-danger" asp-validation-for="RegisterName"></span>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control form-control-lg" asp-for="NickName" placeholder="昵称">
+                        <span class="text-danger" asp-validation-for="NickName"></span>
+                    </div>
+                    <div class="form-group">
+                        <!--省份选择-->
+                        <select class="col-12 col-xl-6 prov" id="prov_register">
+                            <option>=请选择省份=</option>
+                        </select>
+
+                        <!--城市选择-->
+                        <select class="col-12 col-xl-6 col-auto mt-3" id="city_register">
+                            <option>=请选择城市=</option>
+                        </select>
+                        <input hidden asp-for="City" id="addr_register" />
+                        <span class="text-danger" asp-validation-for="City" id="citySpan_register"></span>
+                    </div>
+                    <div class="form-group">
+                        <input  class="form-control form-control-lg" asp-for="Password" placeholder="密码" id="psw">
+                        <span class="text-danger" asp-validation-for="Password"></span>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control form-control-lg" asp-for="ConfirmPassword" placeholder="确认密码">
+                        <span class="text-danger" asp-validation-for="ConfirmPassword"></span>
+                    </div>
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <label class="form-check-label text-muted">
+                                <input type="checkbox" class="form-check-input"> 同意我很帅的
+                            </label>
+                        </div>
+                    </div>
+                    <input type="hidden" asp-for="LoginAccount" />
+                    <input type="hidden" asp-for="LoginPassword" />
+                    <div class="mt-3 col-12">
+                        <button type="submit" class="btn-block btn-primary btn-lg" id="submit_register">注册</button>
+                    </div>
+                    <div class="text-center mt-4 ">
+                        <span class="text-black">已经有账号了？ </span>
+                        <a asp-action="Login" class="text-primary">登录</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Js{
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script src="~/js/Area/City.js"></script>
+    <script src="~/js/Area/Method.js"></script>
+}

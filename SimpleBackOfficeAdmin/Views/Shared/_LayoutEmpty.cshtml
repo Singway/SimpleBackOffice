@@ -1,0 +1,29 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link rel="icon" type="image/x-icon" href="~/images/favicon .ico" />
+    <link href="~/css/simple-line-icons.css" rel="stylesheet" />
+    <link href="~/css/flag-icon.min.css" rel="stylesheet" />
+    <link href="~/css/vendor.bundle.base.css" rel="stylesheet" />
+    <link href="~/css/style.css" rel="stylesheet" />
+    <link rel="shortcut icon" src="~/images/favicon.png" />
+    @RenderSection("Css", false)
+</head>
+<body onload="startTime()">
+    <div class="container-scroller">
+        <div class="container-fluid page-body-wrapper full-page-wrapper">
+            @RenderBody()
+        </div>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+    <script src="~/js/vendor.bundle.base.js"></script>
+    <script src="~/js/off-canvas.js"></script>
+    <script src="~/js/misc.js"></script>
+    @RenderSection("Js", false)
+</body>
+</html>

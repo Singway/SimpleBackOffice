@@ -1,0 +1,307 @@
+﻿@{
+    ViewBag.Title = "角色管理";
+}
+@using Microsoft.AspNetCore.Identity;
+@model RoleViewModel
+@inject UserManager<IdentityUserV2> userManager
+@section Css{
+    <link href="~/css/forms/select2.min.css" rel="stylesheet" />
+    <link href="~/css/forms/select2-bootstrap.min.css" rel="stylesheet" />
+}
+
+<div class="content-wrapper">
+    <div class="page-header">
+        <h3 class="page-title"> 角色管理 </h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index"><i class="icon-home"></i>首页</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@ViewBag.Title</li>
+            </ol>
+        </nav>
+    </div>
+    @*查询*@
+    <div class="row purchace-popup">
+        <div class="col-12 stretch-card grid-margin">
+            <div class="card card-secondary">
+                <span class="card-header">
+                    查询条件
+                </span>
+                <div class="card-body d-lg-flex align-items-center">
+                    <div class="form-group mb-lg-0">
+                        <label>模糊查询</label>
+                        <input type="text" class="form-control" id="searchName" placeholder="查询信息">
+                    </div>
+                    <button type="button" target="_blank" id="Search" class="btn ml-lg-auto btn-dark"><i class="icon-magnifier"></i>查询</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <span id="errorMessage" class="text-danger justify-content-center ">@ViewBag.ErrorMessage</span>
+        </div>
+    </div>
+    @*表格*@
+    <div class="row">
+        <section class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-header">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            显示风格
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="DefaultStyle()">默 认</a>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="StripedStyle()">间 隔</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-title">
+                        <a id="add" class="text-center btn-outline-primary  btn btn-sm"><i class="icon-fire"></i>新增</a>
+                    </div>
+                    <table class="table table-hover table-responsive-lg">
+                        <tr>
+                            <th>角色名称</th>
+                            <th>角色描述</th>
+                            @if (User.IsInRole("admin"))
+                            {
+                                <th class="text-center">操  作</th>
+                            }
+                        </tr>
+                        <tbody>
+                            @foreach (IdentityRoleV2 role in Model.Roles)
+                            {
+                                <tr>
+                                    <td>@role.Name</td>
+                                    <td>
+                                        @role.Description
+
+                                        @*分配用户角色*@
+                                        <div class="modal fade" id="allotUser_@role.Id" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h4 class="modal-title text-left" id="myModalLabel">分配用户到 @role.Name</h4>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                                    </div>
+                                                    <form method="post" asp-controller="Role" asp-action="EditUsersInRole" asp-route-roleName="@role.Name">
+                                                        <div class="modal-body">
+                                                            <div class="row">
+                                                                @for (int i = 0; i < Model.Users.Count; i++)
+                                                                {
+                                                                    <section class="col-1 mb-2"></section>
+                                                                    <section class="col-5 mb-2">
+                                                                        @if (Model.Users[i].InRoles.Contains(role.Name))
+                                                                        {
+                                                                            //防止默认用户角色被修改
+                                                                            @if (role.Name == "admin" && Model.Users[i].Name == "admin")
+                                                                            {
+                                                                                <div class="form-check">
+                                                                                    <input type="checkbox" class="form-check-input" checked disabled value="true" />
+                                                                                    <input type="hidden" asp-for="@Model.Users[i].InRole" value=true />
+                                                                                </div>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <div class="form-check">
+                                                                                    <input type="checkbox" asp-for="@Model.Users[i].InRole" class="form-check-input" checked />
+                                                                                </div>
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <div class="form-check">
+                                                                                <input type="checkbox" asp-for="@Model.Users[i].InRole" class="form-check-input" />
+                                                                            </div>
+                                                                        }
+
+                                                                        <label asp-for="@Model.Users[i].InRole" class="form-check-label">@Model.Users[i].Name</label>
+                                                                        <input type="hidden" asp-for="@Model.Users[i].Id" />
+                                                                        <input type="hidden" asp-for="@Model.Users[i].Name" />
+                                                                    </section>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon	glyphicon-remove" aria-hidden="true"></span>关闭</button>
+                                                            <button type="submit" id="btn_submit" class="btn btn-primary"><span class="glyphicon	glyphicon-floppy-disk" aria-hidden="true"></span>保存</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @*分配部门角色*@
+                                        <div class="modal fade" id="allotDept_@role.Id" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h4 class="modal-title text-left" id="myModalLabel">分配部门到 @role.Name</h4>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                                    </div>
+                                                    <form method="post" asp-controller="Role" asp-action="EditDeptsInRole" asp-route-roleId="@role.Id">
+                                                        <div class="modal-body">
+                                                            <div class="row">
+                                                                @for (int i = 0; i < Model.Depts.Count; i++)
+                                                                {
+                                                                    <section class="col-1 mb-2"></section>
+                                                                    <section class="col-5 mb-2">
+                                                                        @if (Model.Depts[i].InRoles.Contains(role.Id))
+                                                                        {
+                                                                            //默认部门角色不能修改
+                                                                            @if (role.Name == "admin" && Model.Depts[i].Id == 2)
+                                                                            {
+                                                                                <div class="form-check">
+                                                                                    <input type="checkbox" class="form-check-input" checked disabled />
+                                                                                    <input type="hidden" asp-for="@Model.Depts[i].InRole" value=true />
+                                                                                </div>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <div class="form-check">
+                                                                                    <input type="checkbox" asp-for="@Model.Depts[i].InRole" class="form-check-input" checked />
+                                                                                </div>
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+
+                                                                            <div class="form-check">
+                                                                                <input type="checkbox" asp-for="@Model.Depts[i].InRole" class="form-check-input" />
+                                                                            </div>
+                                                                        }
+
+                                                                        <label asp-for="@Model.Depts[i].InRole" class="form-check-label">@Model.Depts[i].DeptName</label>
+                                                                        <input type="hidden" asp-for="@Model.Depts[i].Id" />
+                                                                        <input type="hidden" asp-for="@Model.Depts[i].DeptName" />
+                                                                    </section>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon	glyphicon-remove" aria-hidden="true"></span>关闭</button>
+                                                            <button type="submit" id="btn_submit" class="btn btn-primary"><span class="glyphicon	glyphicon-floppy-disk" aria-hidden="true"></span>保存</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @*修改角色表单*@
+                                        <div class="modal fade" id="edit_@role.Id" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h4 class="modal-title text-left" id="myModalLabel">修改角色</h4>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                                    </div>
+                                                    <span hidden id="errorMessage_@role.Id" class="align-items-center text-danger">@ViewBag.ErrorMessage</span>
+                                                    <form method="post" asp-controller="Role" asp-action="EditRole">
+                                                        <div class="modal-body">
+                                                            <div class="form-group">
+                                                                <label asp-for="Role.Name">角色名称</label>
+                                                                <input asp-for="Role.Name" class="form-control" value="@role.Name">
+                                                                <span class="text-danger" asp-validation-for="Role.Name"></span>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label asp-for="Role.Description">角色描述</label>
+                                                                <input asp-for="Role.Description" class="form-control" value="@role.Description">
+                                                                <span class="text-danger" asp-validation-for="Role.Description"></span>
+                                                            </div>
+                                                            <input type="hidden" asp-for="Role.Id" value="@role.Id" />
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon	glyphicon-remove" aria-hidden="true"></span>关闭</button>
+                                                            @if (role.Name == "admin" || role.Name == "default")
+                                                            {
+                                                                <p id="btn_submit" class="btn btn-primary text-danger"><span class="glyphicon	glyphicon-floppy-disk" aria-hidden="true"></span>系统角色禁止修改或删除</p>
+                                                            }
+                                                            else
+                                                            {
+                                                                <button type="submit" id="btn_submit" class="btn btn-primary"><span class="glyphicon	glyphicon-floppy-disk" aria-hidden="true"></span>保存</button>
+                                                            }
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </td>
+                                    @if (User.IsInRole("admin"))
+                                    {
+
+                                        <td class="text-center">
+                                            <span id="normalSpan_@role.Id">
+                                                <button class="btn-default" onclick="Edit('@role.Id')">编 辑</button>
+                                                <button class="btn-dark" onclick="AllotUser('@role.Id')">分配用户</button>
+                                                <button class="btn-inverse-success  text-black" onclick="AllotDept('@role.Id')">分配部门</button>
+                                                <button href="javascript:void(0)" type="button" class="btn-danger" onclick="confirmDelete('@role.Id',true)">删 除</button>
+                                            </span>
+                                            @if (role.Name == "admin" || role.Name == "default")
+                                            {
+                                                <span id="confirmSpan_@role.Id" style="display:none">
+                                                    <span>系统角色禁止修改或删除</span>
+                                                    <button type="button" class="btn-inverse-dark" onclick="confirmDelete('@role.Id', false)">返回</button>
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <form asp-action="Delete" asp-route-id="@role.Id">
+                                                    <span id="confirmSpan_@role.Id" style="display:none">
+                                                        <span>确定要删除该角色吗？</span>
+                                                        <button type="submit" class="btn-danger">确认</button>
+                                                        <button type="button" class="btn-inverse-dark" onclick="confirmDelete('@role.Id', false)">返回</button>
+                                                    </span>
+                                                </form>
+                                            }
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@*创建角色表单*@
+<div class="modal fade" id="create" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title text-left" id="myModalLabel">新增</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <form method="post" asp-action="Add">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label asp-for="Name">角色名称</label>
+                        <input asp-for="Name" class="form-control" placeholder="不可空，20字以内">
+                        <span class="text-danger" asp-validation-for="Name"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Description">角色描述</label>
+                        <input asp-for="Description" class="form-control" placeholder="可空，50字以内">
+                        <span class="text-danger" asp-validation-for="Description"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon	glyphicon-remove" aria-hidden="true"></span>关闭</button>
+                    <button type="submit" id="btn_submit" class="btn btn-primary"><span class="glyphicon	glyphicon-floppy-disk" aria-hidden="true"></span>保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<input hidden id="errorId" value="@ViewBag.Id" />
+
+@section Js{
+    @*<script src="~/lib/jquery/dist/jquery.js"></script>*@
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+    <script src="~/js/select2.min.js"></script>
+    <script src="~/js/Index.js"></script>
+}

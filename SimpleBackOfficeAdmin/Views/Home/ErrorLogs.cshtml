@@ -1,0 +1,104 @@
+﻿@{
+    ViewBag.Tittle = "错误日志";
+}
+@model List<LogViewModel>
+@section Css{
+    <link href="~/css/forms/select2.min.css" rel="stylesheet" />
+    <link href="~/css/forms/select2-bootstrap.min.css" rel="stylesheet" />
+}
+
+<div class="content-wrapper">
+    <div class="page-header">
+        <h3 class="page-title"> @ViewBag.Tittle </h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index"><i class="icon-home"></i>首页</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@ViewBag.Tittle</li>
+            </ol>
+        </nav>
+    </div>
+    @*查询*@
+    <div class="row ">
+        <div class="col-12 stretch-card grid-margin">
+            <div class="card card-secondary">
+                <span class="card-header">
+                    查询条件
+                </span>
+                <div class="card-body d-lg-flex align-items-center">
+                    <div class="form-group mb-lg-0">
+                        <label>模糊查询</label>
+                        <input type="text" class="form-control" id="searchName" placeholder="查询信息">
+                    </div>
+                    <button type="button" target="_blank" id="Search" class="btn ml-lg-auto btn-dark"><i class="icon-magnifier"></i>查询</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*表格*@
+    <div class="row">
+        <section class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-header">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            显示风格
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="DefaultStyle()">默 认</a>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="StripedStyle()">间 隔</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-title">错误日志 </h6>
+                    <table class="table table-hover table-responsive">
+                        <tr>
+                            <th>时 间</th>
+                            <th>账 号</th>
+                            <th>请求路径</th>
+                            <th>请求方式</th>
+                            <th>异常信息</th>
+                            <th>主机名</th>
+                            <th>相关组件</th>
+                        </tr>
+                        <tbody>
+                            @foreach (var log in Model)
+                            {
+                            <tr>
+                                <td>@log.Operatingtime</td>
+                                <td>@log.Identity</td>
+                                <td>@log.Requesturl</td>
+                                <td>@log.Method</td>
+                                <td>
+                                    <a href="javascript:void(0)" onclick="Detail('@log.Id')">详  情</a>
+                                    <div class="modal fade" id="Detail_@log.Id" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h4 class="modal-title text-left" id="myModalLabel">详  情</h4>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                                </div>
+                                                <div class="modal-body ">
+                                                    <div style="white-space:normal;height:auto;width:auto;margin:10px;background-color:wheat;">
+                                                        <p>@log.Exception</p>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon	glyphicon-remove" aria-hidden="true"></span>关闭</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>@log.UserName</td>
+                                <td>@log.Loger</td>
+                            </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

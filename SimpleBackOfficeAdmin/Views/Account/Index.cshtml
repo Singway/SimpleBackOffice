@@ -1,0 +1,332 @@
+﻿@{
+    ViewBag.Title = "用户管理";
+}
+
+@using Microsoft.AspNetCore.Identity;
+@inject UserManager<IdentityUserV2>  userManager
+@model AccViewModel
+
+
+@section Css{
+    <link href="~/css/forms/select2.min.css" rel="stylesheet" />
+    <link href="~/css/forms/select2-bootstrap.min.css" rel="stylesheet" />
+}
+
+
+<div class="content-wrapper">
+    <div class="page-header">
+        <h3 class="page-title"> 用户管理 </h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index"><i class="icon-home"></i>首页</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@ViewBag.Title</li>
+            </ol>
+        </nav>
+    </div>
+    @*查询*@
+    <div class="row purchace-popup">
+        <div class="col-12 stretch-card grid-margin">
+            <div class="card card-secondary">
+                <span class="card-header">
+                    查询条件
+                </span>
+                <div class="card-body d-lg-flex align-items-center">
+                    <div class="form-group mb-lg-0">
+                        <label>模糊查询</label>
+                        <input type="text" class="form-control" id="searchName" placeholder="查询信息">
+                    </div>
+                    <button type="button" target="_blank" id="Search" class="btn ml-lg-auto btn-dark"><i class="icon-magnifier"></i>查询</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="text-danger" asp-validation-summary="All"></div>
+    <div class="justify-content-center text-danger">@ViewBag.ErrorMessage</div>
+    @*表格*@
+    <div class="row">
+        <section class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-header">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            显示风格
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="DefaultStyle()">默 认</a>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="StripedStyle()">间 隔</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <a id="add" class="ml-lg-auto text-center btn-info btn-rounded btn btn-sm"><i class="icon-fire"></i>新增</a>
+                    </h6>
+                    <table class="table table-hover table-responsive-lg">
+                        <tr>
+                            <th>邮  箱</th>
+                            <th>昵  称</th>
+                            <th>所属部门</th>
+                            <th>职  位</th>
+                            <th>城  市</th>
+                            @if (User.IsInRole("admin"))
+                            {
+                                <th>操  作</th>
+                            }
+                        </tr>
+                        <tbody>
+                            @foreach (IdentityUserV2 user in Model.Users)
+                            {
+                                <tr>
+                                    <td>@user.Email</td>
+                                    <td>@user.NickName</td>
+
+                                    @if (user.Department == null)
+                                    {
+                                        <td>待分配</td>
+                                    }
+                                    else
+                                    {
+                                        <td>@user.Department</td>
+                                    }
+                                    @if (user.Position == null)
+                                    {
+                                        <td>待分配</td>
+                                    }
+                                    else
+                                    {
+                                        <td>@user.Position</td>
+                                    }
+                                    <td>@user.City</td>
+
+                                    @if (User.IsInRole("admin"))
+                                    {
+
+                                        @if (user.UserName == "admin")
+                                        {
+                                            <td>
+                                                <span class="btn-inverse-success">系统管理默认账号禁止修改或删除</span>
+                                            </td>
+                                        }
+                                        else
+                                        {
+
+                                            <td>
+                                                <span id="normalSpan_@user.Id">
+                                                    <button href="" id="editDept" class="btn-inverse-success" onclick="Edit('@user.Id')">编辑</button>
+                                                    <button href="javascript:void(0)" type="button" class="btn-inverse-danger" onclick="confirmDelete('@user.Id',true)">删除</button>
+                                                </span>
+
+                                                @*修改用户表单*@
+                                                <div class="modal fade" id="edit_@user.Id" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h4 class="modal-title text-left" id="myModalLabel">编辑用户</h4>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                                            </div>
+                                                            <span hidden id="errorMessage_@user.Id" class="justify-content-center text-danger">@ViewBag.ErrorMessage</span>
+                                                            <form method="post" asp-action="EditUser">
+                                                                <div class="modal-body">
+                                                                    <div class="form-group">
+                                                                        <label>账号名</label>
+                                                                        <input class="form-control form-control-lg" asp-for="RegisterName" value="@user.UserName" disabled>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label asp-for="UserV2.NickName">昵  称</label>
+                                                                        <input asp-for="UserV2.NickName" class="form-control" value="@user.NickName">
+                                                                        <span asp-validation-for="UserV2.NickName" class="text-danger"></span>
+                                                                    </div>
+                                                                    <div class="form-group col-12">
+                                                                        <label asp-for="Department">所属部门</label>
+                                                                        <select asp-for="Department" class="form-control">
+                                                                            <option>0，待分配</option>
+                                                                            @foreach (string sub in Model.Subordinates)
+                                                                            {
+                                                                                <option>@sub</option>
+                                                                            }
+                                                                        </select>
+                                                                        <span asp-validation-for="Department" class="text-danger"></span>
+                                                                    </div>
+                                                                    <div class="form-group col-12">
+                                                                        <label asp-for="UserV2.Position">职位</label>
+                                                                        <select class="form-control" id="position_@user.Id" onchange="EditPosi('@user.Id')">
+                                                                            <option>待分配</option>
+                                                                            @foreach (string posi in Model.Positions)
+                                                                            {
+                                                                                <option>@posi</option>
+                                                                            }
+                                                                        </select>
+                                                                        <input asp-for="UserV2.Position" hidden id="posi_@user.Id" value="@user.Position" />
+                                                                        <span asp-validation-for="UserV2.Position" class="text-danger"></span>
+                                                                    </div>
+                                                                    <div class="form-group row">
+                                                                        <label asp-for="UserV2.City">城市</label>
+                                                                        <select class="col-12 prov" id="prov_@user.Id" onchange="showCity('@user.Id')">
+                                                                            <option>=请选择省份=</option>
+                                                                        </select>
+                                                                        <select class="col-12 mt-3" id="city_@user.Id" onchange="putValue('@user.Id')">
+                                                                            <option>=请选择城市=</option>
+                                                                        </select>
+                                                                        <input type="hidden" asp-for="UserV2.City" id="addr_@user.Id" value="@user.City" />
+                                                                        <span asp-validation-for="UserV2.City" class="text-danger" id="citySpan_@user.Id"></span>
+                                                                    </div>
+                                                                    <input type="hidden" asp-for="UserV2.Id" value="@user.Id" />
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon	glyphicon-remove" aria-hidden="true"></span>关闭</button>
+                                                                    <button type="submit" id="submit_@user.Id" class="btn btn-primary"><span class="glyphicon	glyphicon-floppy-disk" aria-hidden="true"></span>保存</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <form asp-action="Delete" asp-route-id="@user.Id">
+                                                    <span id="confirmSpan_@user.Id" style="display:none">
+                                                        <span>确定要删除该用户吗？</span>
+                                                        <button type="submit" class="btn-danger">确认</button>
+                                                        <button type="button" class="btn-inverse-dark" onclick="confirmDelete('@user.Id', false)">返回</button>
+                                                    </span>
+                                                </form>
+                                            </td>
+                                        }
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+
+@*创建用户表单*@
+<div class="modal fade" id="create" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title text-left" id="myModalLabel">新增用户</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <form method="post" asp-action="Add">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input class="form-control form-control-lg" asp-for="RegisterEmail" placeholder="邮  箱">
+                        <span class="text-danger" asp-validation-for="RegisterEmail"></span>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control form-control-lg" asp-for="RegisterName" placeholder="登录名">
+                        <span class="text-danger" asp-validation-for="RegisterName"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="UserV2.NickName">昵  称</label>
+                        <input asp-for="UserV2.NickName" class="form-control" placeholder="昵  称">
+                        <span asp-validation-for="UserV2.NickName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-12">
+                        <label asp-for="Department">所属部门</label>
+                        <select asp-for="Department" class="form-control">
+                            <option>0，待分配</option>
+                            @foreach (string sub in Model.Subordinates)
+                            {
+                                <option>@sub</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Department" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-12">
+                        <label asp-for="UserV2.Position">职位</label>
+                        <select asp-for="UserV2.Position" class="form-control">
+                            <option>待分配</option>
+                            @foreach (string posi in Model.Positions)
+                            {
+                                <option>@posi</option>
+                            }
+                        </select>
+                        <span asp-validation-for="UserV2.Position" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="UserV2.City">城市</label>
+                        <select class="col-12 col-xl-6 prov" id="prov_register" onchange="showCity('register')">
+                            <option>=请选择省份=</option>
+                        </select>
+                        <select class="col-12 col-xl-6 col-auto mt-3" id="city_register" onchange="putValue('register')">
+                            <option>=请选择城市=</option>
+                        </select>
+                        <input type="hidden" asp-for="UserV2.City" id="addr_register" />
+                        <span asp-validation-for="UserV2.City" class="text-danger" id="citySpan_register"></span>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control form-control-lg" asp-for="Password" id="psw" placeholder="密码">
+                        <span class="text-danger" asp-validation-for="Password"></span>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control form-control-lg" asp-for="ConfirmPassword" placeholder="确认密码">
+                        <span class="text-danger" asp-validation-for="ConfirmPassword"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon	glyphicon-remove" aria-hidden="true"></span>关闭</button>
+                    <button type="submit" id="submit_register" class="btn btn-primary"><span class="glyphicon	glyphicon-floppy-disk" aria-hidden="true"></span>保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<input hidden id="errorId" value="@ViewBag.Id" />
+
+@section Js{
+    @*<script src="~/lib/jquery/dist/jquery.js"></script>*@
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+    <script src="~/js/select2.min.js"></script>
+    <script src="~/js/Area/City.js"></script>
+    <script src="~/js/Area/Method.js"></script>
+    <script src="~/js/Index.js"></script>
+    @*<script>
+            $(function () {
+                var _id = $("#errorId").val();
+                if (!!_id) {
+                    $("#edit_" + _id).modal();
+                    $("#errorMessage_" + _id).removeAttr("hidden");
+                }
+            });
+            $("#add").click(function () {
+                $("#create").modal();
+            });
+            function Edit(uniqueId) {
+                $("#edit_" + uniqueId).modal();
+            };
+            function EditPosi(uniqueId) {
+                var posi = $("#position_" + uniqueId).find('option:selected').val();
+                $("#posi_" + uniqueId).val(posi);
+            };
+            $("#Search").on('click', function () {
+                var name = $("#searchName").val();
+                $("table tbody tr").hide()
+                    .filter(":contains('" + name + "')")
+                    .show();
+            });
+            $("#psw").change(function () {
+                if (!$("#addr_register").val()) {
+                    $("#submit_register").attr("disabled");
+                    $("#citySpan_register").text("请选择城市");
+                }
+            });
+            function confirmDelete(uniqueId, openOrClose) {
+                var normalSpan = "normalSpan_" + uniqueId;
+                var confirmSpan = "confirmSpan_" + uniqueId;
+                if (openOrClose) {
+                    $("#" + normalSpan).hide();
+                    $("#" + confirmSpan).show();
+                } else {
+                    $("#" + normalSpan).show();
+                    $("#" + confirmSpan).hide();
+                }
+            }
+        </script>*@
+}
+
+

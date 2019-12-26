@@ -1,0 +1,203 @@
+﻿@using Microsoft.AspNetCore.Identity;
+@inject UserManager<IdentityUserV2>  userManager
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>@ViewBag.Title</title>
+    @*图标样式*@
+    <link rel="icon" type="image/x-icon" href="~/images/favicon .ico" />
+    <link rel="stylesheet" href="~/css/simple-line-icons.css">
+    <link rel="stylesheet" href="~/css/flag-icon.min.css">
+    <link rel="stylesheet" href="~/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="~/css/daterangepicker.css">
+    <link rel="stylesheet" href="~/css/chartist.min.css">
+    @RenderSection(name: "Css", required: false)
+    <link href="~/css/site.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/style.css">
+
+</head>
+<body>
+
+    <div class="container-scroller">
+        <!-- 头部 -->
+        <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+            <div class="navbar-brand-wrapper d-flex align-items-center">
+                <a class="navbar-brand brand-logo" asp-controller="Home" asp-action="index">
+                    <h3 class="text-center text-white">Simple</h3>
+                </a>
+                <a class="navbar-brand brand-logo-mini" asp-controller="Home" asp-action="index">
+                    <h2 class="text-center text-white">S</h2>
+                </a>
+            </div>
+            <div class="navbar-menu-wrapper d-flex align-items-center flex-grow-1">
+                <h5 class="mb-0 font-weight-medium d-none d-lg-flex">欢迎使用先普后台管理</h5>
+                <ul class="navbar-nav navbar-nav-right ml-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link count-indicator message-dropdown" id="messageDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
+                            <i class="icon-speech"></i>
+                            <span class="count">7</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0" aria-labelledby="messageDropdown">
+                            <a class="dropdown-item py-3">
+                                <p class="mb-0 font-weight-medium float-left">消息推送正在开发中。。。 </p>
+                                <span class="badge badge-pill badge-primary float-right">99+</span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item preview-item">
+                                <div class="preview-thumbnail">
+                                    <img src="~/images/faces/Default.jpg" alt="image" class="img-sm profile-pic">
+                                </div>
+                                <div class="preview-item-content flex-grow py-2">
+                                    <p class="preview-subject ellipsis font-weight-medium text-dark">王经理 </p>
+                                    <p class="font-weight-light small-text"> 会议取消</p>
+                                </div>
+                            </a>
+                        </div>
+                    </li>
+
+                    <li class="nav-item dropdown d-inline-flex user-dropdown">
+                        <a class="nav-link dropdown-toggle" id="UserDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
+                            @if (User.Identity != null)
+                            {
+                                @if (userManager.GetUserAsync(User).Result.Photo != null)
+                                {
+                                    <img class="img-xs rounded-circle ml-2" src="~/images/faces/@userManager.GetUserAsync(User).Result.Photo" alt="Profile image" height="80" width="80">
+                                }
+                                else
+                                {
+                                    <img class="img-xs rounded-circle ml-2" src="~/images/faces/Default.jpg" alt="Profile image">
+                                }
+                            }
+                                <span class="font-weight-normal">@userManager.GetUserAsync(User).Result.NickName</span>
+                            </a>
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
+                            <div class="dropdown-header text-center">
+                                @if (User.Identity != null)
+                                {
+                                    @if (@userManager.GetUserAsync(User).Result.Photo != null)
+                                    {
+                                        <img class="img-md rounded-circle" src="~/images/faces/@userManager.GetUserAsync(User).Result.Photo" alt="Profile image" height="100" width="100">
+                                    }
+                                    else
+                                    {
+                                        <img class="img-md rounded-circle" src="~/images/faces/Default.jpg" alt="Profile image">
+                                    }
+                                }
+                                    <p class="mb-1 mt-3">@User.Identity.Name</p>
+                                    <p class="font-weight-light text-muted mb-0">@userManager.GetUserAsync(User).Result.Email</p>
+                                </div>
+                            <form asp-action="SignOut" asp-controller="Account">
+                                <button type="submit" class="dropdown-item" asp-controller="Account" asp-action="SignOut"><i class="dropdown-item-icon icon-power text-primary"></i>注销</button>
+                            </form>
+                        </div>
+                    </li>
+                </ul>
+                <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+                    <span class="icon-menu"></span>
+                </button>
+            </div>
+        </nav>
+        <!-- 正文部分 -->
+        <div class="container-fluid page-body-wrapper">
+            <!-- 菜单栏-->
+            <nav class="sidebar sidebar-offcanvas" id="sidebar">
+                <ul class="nav">
+                    <li class="nav-item nav-profile">
+                        <a class="nav-link" asp-controller="Account" asp-action="PersonalCenter">
+                            <div class="profile-image">
+                                @if (User.Identity != null)
+                                {
+                                    @if (userManager.GetUserAsync(User).Result.Photo != null)
+                                    {
+                                        <img class="img-xs rounded-circle ml-2" src="~/images/faces/@userManager.GetUserAsync(User).Result.Photo" alt="Profile image" height="80" width="80">
+                                    }
+                                    else
+                                    {
+                                        <img class="img-xs rounded-circle ml-2" src="~/images/faces/Default.jpg" alt="Profile image">
+                                    }
+                                }
+                                <div class="dot-indicator bg-success"></div>
+                            </div>
+                            <div class="text-wrapper">
+                                <p class="profile-name">@User.Identity.Name</p>
+                                <p class="designation">个人中心</p>
+                            </div>
+                            <i class="icon-user menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Account" asp-action="Lock">
+                            <span class="menu-title">系统锁屏</span>
+                            <i class=" icon-lock menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item nav-category">
+                        <span class="nav-link">管理</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Department" asp-action="Index">
+                            <span class="menu-title">部门管理</span>
+                            <i class="icon-briefcase menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Account" asp-action="Index">
+                            <span class="menu-title">用户管理</span>
+                            <i class="icon-people menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Role" asp-action="Index">
+                            <span class="menu-title">角色管理</span>
+                            <i class="icon-user-following menu-icon"></i>
+                        </a>
+                    </li>
+
+                    <li class="nav-item nav-category">
+                        <span class="nav-link">日志管理</span>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Home" asp-action="LoginLogs">
+                            <span class="menu-title">登录日志</span>
+                            <i class="icon-user-following menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Home" asp-action="OperatingLogs">
+                            <span class="menu-title">操作日志</span>
+                            <i class="icon-user-following menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Home" asp-action="ErrorLogs">
+                            <span class="menu-title">错误日志</span>
+                            <i class="icon-user-following menu-icon"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <!-- 局部页面 -->
+            <div class="main-panel">
+                @RenderBody()
+                <div class="d-sm-flex justify-content-center justify-content-sm-between" style="background-color:aliceblue;height:auto">
+                    <span class="text-muted text-center text-sm-left d-block d-sm-inline-block ml-2 mb-2 mt-2">本网站作者：@@蜜蜂 <a href="javascript:void(0)" title="本人邮箱">q490013473@@hotmail.com</a> - WeChat <a href="javascript:void(0)" title="微信">490013473</a></span>
+                    <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">made with <i class="icon-heart text-danger"></i></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/js/vendor.bundle.base.js"></script>
+    <script src="~/js/Chart.min.js"></script>
+    <script src="~/js/moment.min.js"></script>
+    <script src="~/js/daterangepicker.js"></script>
+    <script src="~/js/chartist.min.js"></script>
+    <script src="~/js/off-canvas.js"></script>
+    <script src="~/js/misc.js"></script>
+    <script src="~/js/dashboard.js"></script>
+    <script src="~/js/TableStyle.js"></script>
+    @RenderSection(name: "Js", required: false)
+</body>
+</html>

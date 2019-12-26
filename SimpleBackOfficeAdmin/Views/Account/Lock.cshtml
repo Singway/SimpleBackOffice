@@ -1,0 +1,33 @@
+﻿@{
+    Layout = "_LayoutEmpty";
+}
+@model LockViewModel
+
+<div class="content-wrapper d-flex align-items-center auth">
+    <div class="row flex-grow">
+        <div class="col-lg-4 mx-auto">
+            <div class="auth-form-light text-center p-5">
+                <div class="brand-logo">
+                    <b>Simple</b>
+                </div>
+                <h3 onloadstart="">用户锁屏</h3>
+                <p id="time" style="font-size:80px"></p>
+                <form class="pt-3" asp-controller="Account" asp-action="Lock">
+                    <div class="form-group">
+                        <h4 id="info" class="font-weight-light">账户： </h4>
+                        <input class="form-control form-control-lg" placeholder="输入密码返回后台" type="password" asp-for="Password">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <input id="account" type="hidden" asp-for="Account"/>
+                    </div>
+                    <span>想要重新登录？点击<a asp-action="Login" asp-controller="Account">这里</a></span>
+                    <div class="mt-3">
+                        <button class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" type="submit"><h4><i class=" icon-lock-open"></i>  解 锁 <i class=" icon-arrow-right-circle"></i></h4> </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Js{
+    <script src="~/js/Time.js"></script>
+}

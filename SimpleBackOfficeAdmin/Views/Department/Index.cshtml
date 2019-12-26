@@ -1,0 +1,229 @@
+﻿@model DeptViewModel
+
+@{
+    ViewBag.Title = "部门管理";
+}
+
+@section Css{
+    <link href="~/css/forms/select2.min.css" rel="stylesheet" />
+    <link href="~/css/forms/select2-bootstrap.min.css" rel="stylesheet" />
+}
+
+<div class="content-wrapper">
+    <div class="page-header">
+        <h3 class="page-title"> 部门管理 </h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index"><i class="icon-home"></i>首页</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@ViewBag.Title</li>
+            </ol>
+        </nav>
+    </div>
+    @*查询*@
+    <div class="row purchace-popup">
+        <div class="col-12 stretch-card grid-margin">
+            <div class="card card-secondary">
+                <span class="card-header">
+                    查询条件
+                </span>
+                <div class="card-body d-lg-flex align-items-center">
+                    <div class="form-group mb-lg-0">
+                        <label>模糊查询</label>
+                        <input type="text" class="form-control" id="searchName" placeholder="查询信息">
+                    </div>
+                    @*<div class="form-group mb-lg-0 ml-lg-5">
+                            <label asp-for="SearchView.Description">部门描述</label>
+                            <input type="text" class="form-control" id="searchDesc" name="searchDesc" asp-for="SearchView.Description" placeholder="部门描述">
+                        </div>*@
+                    <button type="button" target="_blank" id="Search" class="btn ml-lg-auto btn-dark"><i class="icon-magnifier"></i>查询</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*表格*@
+    <div class="row">
+        <section class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-header">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            显示风格
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="DefaultStyle()">默 认</a>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="StripedStyle()">间 隔</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <a id="add" class="ml-lg-auto text-center btn-info btn-rounded btn btn-sm"><i class="icon-fire"></i>新增</a>
+                    </h6>
+                    <table class="table table-hover table-responsive-lg">
+                        <tr>
+                            <th>部门编码</th>
+                            <th>部门名称</th>
+                            <th>从属部门</th>
+                            <th>部门描述</th>
+                            @if (User.IsInRole("admin"))
+                            {
+                                <th>操  作</th>
+                            }
+                        </tr>
+                        <tbody>
+                            @foreach (Department dept in Model.Departments)
+                            {
+                                <tr>
+                                    <td>@dept.DeptCode</td>
+                                    <td>@dept.DeptName</td>
+                                    @if (dept.Subordinate == "0")
+                                    {
+                                        <td>无</td>
+                                    }
+                                    else
+                                    {
+                                        <td>@Model.Departments.FirstOrDefault(d => d.DeptCode == dept.Subordinate).DeptName</td>
+                                    }
+                                    <td>@dept.Description</td>
+                                    @if (User.IsInRole("admin") || User.IsInRole("default"))
+                                    {
+                                        @if (dept.Id == 2)
+                                        {
+                                            <td>
+                                                <span class="btn-inverse-success">系统管理默认部门禁止修改或删除</span>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td>
+                                                <span id="normalSpan_@dept.Id">
+                                                    <button href="" class="btn-inverse-success" onclick="Edit('@dept.Id')">编辑</button>
+                                                    <button href="javascript:void(0)" type="button" class="btn-inverse-danger" onclick="confirmDelete('@dept.Id',true)">删除</button>
+                                                </span>
+
+                                                @*修改部门表单*@
+                                                <div class="modal fade" id="edit_@dept.Id" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h4 class="modal-title text-left" id="myModalLabel">修改部门</h4>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                                            </div>
+                                                            <span hidden id="errorMessage_@dept.Id" class="align-content-center text-danger">@ViewBag.ErrorMessage</span>
+                                                            <form method="post" asp-action="Edit">
+                                                                <div class="modal-body">
+                                                                    <div class="form-group">
+                                                                        <label asp-for="Department.DeptCode">部门编码</label>
+                                                                        <input type="text" asp-for="Department.DeptCode" class="form-control" value="@dept.DeptCode">
+                                                                        <span class="text-danger" asp-validation-for="Department.DeptCode"></span>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label asp-for="Department.DeptName">部门名称</label>
+                                                                        <input type="text" asp-for="Department.DeptName" class="form-control" value="@dept.DeptName">
+                                                                        <span class="text-danger" asp-validation-for="Department.DeptName"></span>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label asp-for="Department.Subordinate">上级部门编码</label>
+                                                                        <select id="subordinate_@dept.Id" class="form-control-sm" onchange="EditSub('@dept.Id')">
+                                                                            @foreach (string sub in Model.Subordinates)
+                                                                            {
+                                                                                if (dept.DeptCode == sub)
+                                                                                {
+                                                                                    continue;
+                                                                                }
+                                                                                <option>@sub</option>
+                                                                            }
+                                                                        </select>
+                                                                        <input id="sub_@dept.Id" hidden asp-for="Department.Subordinate" value="@dept.Subordinate" />
+                                                                        <span class="text-danger" asp-validation-for="Department.Subordinate"></span>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label asp-for="Department.Description">部门描述</label>
+                                                                        <input type="text" asp-for="Department.Description" class="form-control" value="@dept.Description">
+                                                                        <span class="text-danger" asp-validation-for="Department.Description"></span>
+                                                                    </div>
+                                                                    <input type="hidden" asp-for="Department.Id" value="@dept.Id" />
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon	glyphicon-remove" aria-hidden="true"></span>关闭</button>
+                                                                    <button type="submit" id="btn_submit" class="btn btn-primary"><span class="glyphicon	glyphicon-floppy-disk" aria-hidden="true"></span>保存</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <form asp-action="Delete" asp-route-id="@dept.Id">
+                                                    <span id="confirmSpan_@dept.Id" style="display:none">
+                                                        <span>确定要删除该部门吗？</span>
+                                                        <button type="submit" class="btn-danger">确认</button>
+                                                        <button type="button" class="btn-inverse-dark" onclick="confirmDelete('@dept.Id', false)">返回</button>
+                                                    </span>
+                                                </form>
+                                            </td>
+                                        }
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+@*创建部门表单*@
+<div class="modal fade" id="create" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title text-left" id="myModalLabel">新增</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+
+            <form method="post" asp-action="Create">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label asp-for="@Model.ConfirmDeptCode">部门编码</label>
+                        <input asp-for="@Model.ConfirmDeptCode" class="form-control" placeholder="部门编码">
+                        <span asp-validation-for="@Model.ConfirmDeptCode" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Department.DeptName">部门名称</label>
+                        <input type="text" asp-for="Department.DeptName" class="form-control" placeholder="部门名称">
+                        <span asp-validation-for="Department.DeptName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Department.Subordinate">上级部门编码</label>
+                        <select asp-for="Department.Subordinate" class="form-control-sm">
+                            @foreach (string sub in Model.Subordinates)
+                            {
+                                <option>@sub</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Department.Subordinate" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Department.Description">部门描述</label>
+                        <input type="text" asp-for="Department.Description" class="form-control" placeholder="部门描述">
+                    </div>
+                    <input type="hidden" asp-for="Department.DeptCode" value="888" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon	glyphicon-remove" aria-hidden="true"></span>关闭</button>
+                    <button type="submit" id="btn_submit" class="btn btn-primary"><span class="glyphicon	glyphicon-floppy-disk" aria-hidden="true"></span>保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<input hidden id="errorId" value="@ViewBag.Id" />
+
+@section Js{
+    @*<script src="~/lib/jquery/dist/jquery.js"></script>*@
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+    <script src="~/js/select2.min.js"></script>
+    <script src="~/js/Index.js"></script>
+}
+
