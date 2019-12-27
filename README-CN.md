@@ -1,6 +1,5 @@
 # SimpleBackOffice
-    
-    [English](https://github.com/Singway/SimpleBackOffice) / 中文
+[English](https://github.com/Singway/SimpleBackOffice) / 中文
 
     本人之前是再零售行业从事管理，由于多个原因，想转行写代码，
     但是发现没有个项目真的很难去展现自己，
