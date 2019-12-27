@@ -1,6 +1,6 @@
 # SimpleBackOffice
+English / [中文](https://github.com/Singway/SimpleBackOffice/blob/master/README-CN.md)
     
-    English / [中文]()
 
     I've been learning ASP.Net Core for a while,trying to establish a Web program.
     So now,I create a simple model whit some fundamental functions.
