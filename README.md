@@ -1,4 +1,7 @@
 # SimpleBackOffice
+    
+    English / [中文]()
+
     I've been learning ASP.Net Core for a while,trying to establish a Web program.
     So now,I create a simple model whit some fundamental functions.
     Establishing by NET Core + EF Core + HTML 5 + Bootstrap  + jQuery +NLog.
