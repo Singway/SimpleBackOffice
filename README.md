@@ -27,8 +27,8 @@
     
   ## Some screenshots
   
-![image](https://github.com/Singway/SimpleBackOffice/blob/master/ReadMe/home.jpg)
-![image](https://github.com/Singway/SimpleBackOffice/blob/master/ReadMe/roleDept.png)
-![image](https://github.com/Singway/SimpleBackOffice/blob/master/ReadMe/lock.png)
-![image](https://github.com/Singway/SimpleBackOffice/blob/master/ReadMe/phonePage.png)
-![image](https://github.com/Singway/SimpleBackOffice/blob/master/ReadMe/errorLog.png)
+![home](https://github.com/Singway/SimpleBackOffice/blob/master/ReadMe/home.jpg)
+![roleDept](https://github.com/Singway/SimpleBackOffice/blob/master/ReadMe/roleDept.png)
+![lock](https://github.com/Singway/SimpleBackOffice/blob/master/ReadMe/lock.png)
+![phonePage](https://github.com/Singway/SimpleBackOffice/blob/master/ReadMe/phonePage.png)
+![errorLog](https://github.com/Singway/SimpleBackOffice/blob/master/ReadMe/errorLog.png)
