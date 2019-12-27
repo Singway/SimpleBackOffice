@@ -16,7 +16,7 @@
     5.
       Implement local and remote information validation.
       
-  ##Database
+  ## Database
     Support MSSQL/Oracle/SQLite....
     Ps: Using different database just need to edit the configuration of the connection.
     
@@ -24,7 +24,8 @@
     This program still needs a lot of improvement and I'll improve or refactor it gradually.
     Seriously,welcome to leave your opinion or suggestion here!
     
-  ##Some screenshots
+  ## Some screenshots
+  
 ![image](https://github.com/Singway/SimpleBackOffice/blob/master/ReadMe/home.png)
 ![image](https://github.com/Singway/SimpleBackOffice/blob/master/ReadMe/roleDept.png)
 ![image](https://github.com/Singway/SimpleBackOffice/blob/master/ReadMe/lock.png)
